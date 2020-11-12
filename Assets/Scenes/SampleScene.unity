@@ -234,6 +234,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_textMasterEnemy: {fileID: 4900000, guid: 954c78f1e5be6a6448a24e9986c3fa0d, type: 3}
+  m_textMasterPlayer: {fileID: 4900000, guid: 6d1767f749966ca4cb849101cdcaa94a, type: 3}
 --- !u!4 &654501775
 Transform:
   m_ObjectHideFlags: 0
