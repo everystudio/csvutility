@@ -38,15 +38,15 @@ namespace csvutility
 			{
 				value = "";
 			}
-			PropertyInfo propertyInfo = this.GetType().GetProperty(key, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-			if (propertyInfo == null)
+			FieldInfo fieldInfo = this.GetType().GetField(key, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+			if (fieldInfo == null)
 			{
 				return;
 			}
 			//Debug.Log(string.Format("key:{0} value:{1}", key, value));
-			if (propertyInfo.PropertyType == typeof(int)) propertyInfo.SetValue(this, int.Parse(value), null);
-			else if (propertyInfo.PropertyType == typeof(long)) propertyInfo.SetValue(this, long.Parse(value), null);
-			else if (propertyInfo.PropertyType == typeof(string))
+			if (fieldInfo.FieldType == typeof(int)) fieldInfo.SetValue(this, int.Parse(value));
+			else if (fieldInfo.FieldType == typeof(long)) fieldInfo.SetValue(this, long.Parse(value));
+			else if (fieldInfo.FieldType == typeof(string))
 			{
 				string strValue = value;
 				if (value.Contains(':') && value.Contains('{') && value.Contains('}'))
@@ -58,28 +58,26 @@ namespace csvutility
 				{
 					strValue = value.Replace("\"", "");
 				}
-				propertyInfo.SetValue(this, strValue, null);
+				fieldInfo.SetValue(this, strValue);
 			}
-			else if (propertyInfo.PropertyType == typeof(float)) propertyInfo.SetValue(this, float.Parse(value), null);
-			else if (propertyInfo.PropertyType == typeof(double)) propertyInfo.SetValue(this, double.Parse(value), null);
-			else if (propertyInfo.PropertyType == typeof(bool)) propertyInfo.SetValue(this, bool.Parse(value), null);
+			else if (fieldInfo.FieldType == typeof(float)) fieldInfo.SetValue(this, float.Parse(value));
+			else if (fieldInfo.FieldType == typeof(double)) fieldInfo.SetValue(this, double.Parse(value));
+			else if (fieldInfo.FieldType == typeof(bool)) fieldInfo.SetValue(this, bool.Parse(value));
 			// 他の型にも対応させたいときには適当にここに。enumとかもどうにかなりそう。
 		}
 		public string GetString(string _strKey)
 		{
-			//Debug.LogWarning(_strKey);
-			PropertyInfo propertyInfo = this.GetType().GetProperty(_strKey, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-			//Debug.LogWarning(propertyInfo);
-			if (propertyInfo != null)
+			FieldInfo fieldInfo = this.GetType().GetField(_strKey, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+			if (fieldInfo != null)
 			{
-				if (propertyInfo.PropertyType == typeof(string))
+				if (fieldInfo.FieldType == typeof(string))
 				{
-					return (string)propertyInfo.GetValue(this, null);
+					return (string)fieldInfo.GetValue(this);
 					//return propertyInfo.GetValue(this, null).ToString();//.Replace("\n", "\r\n");
 				}
 				else
 				{
-					return propertyInfo.GetValue(this, null).ToString();
+					return fieldInfo.GetValue(this).ToString();
 				}
 			}
 			return "";
@@ -87,30 +85,29 @@ namespace csvutility
 
 		public void Set(Dictionary<string, string> _dict)
 		{
-
 			foreach (string key in _dict.Keys)
 			{
-				PropertyInfo propertyInfo = GetType().GetProperty(key);
-				if (propertyInfo.PropertyType == typeof(int))
+				FieldInfo fieldInfo = GetType().GetField(key);
+				if (fieldInfo.FieldType == typeof(int))
 				{
 					int iValue = int.Parse(_dict[key]);
-					propertyInfo.SetValue(this, iValue, null);
+					fieldInfo.SetValue(this, iValue);
 				}
-				else if (propertyInfo.PropertyType == typeof(string))
+				else if (fieldInfo.FieldType== typeof(string))
 				{
-					propertyInfo.SetValue(this, _dict[key].Replace("\"", ""), null);
+					fieldInfo.SetValue(this, _dict[key].Replace("\"", ""));
 				}
-				else if (propertyInfo.PropertyType == typeof(double))
+				else if (fieldInfo.FieldType == typeof(double))
 				{
-					propertyInfo.SetValue(this, double.Parse(_dict[key]), null);
+					fieldInfo.SetValue(this, double.Parse(_dict[key]));
 				}
-				else if (propertyInfo.PropertyType == typeof(float))
+				else if (fieldInfo.FieldType == typeof(float))
 				{
-					propertyInfo.SetValue(this, float.Parse(_dict[key]), null);
+					fieldInfo.SetValue(this, float.Parse(_dict[key]));
 				}
-				else if (propertyInfo.PropertyType == typeof(bool))
+				else if (fieldInfo.FieldType == typeof(bool))
 				{
-					propertyInfo.SetValue(this, bool.Parse(_dict[key]), null);
+					fieldInfo.SetValue(this, bool.Parse(_dict[key]));
 				}
 				else
 				{
@@ -125,11 +122,10 @@ namespace csvutility
 			bool bRet = true;
 			for (int i = 0; i < div_array.Length; i += 4)
 			{
-				//Debug.Log (div_array [i]);
-				PropertyInfo propertyInfo = GetType().GetProperty(div_array[i]);
-				if (propertyInfo.PropertyType == typeof(int))
+				FieldInfo fieldInfo = GetType().GetField(div_array[i]);
+				if (fieldInfo.FieldType == typeof(int))
 				{
-					int intparam = (int)propertyInfo.GetValue(this, null);
+					int intparam = (int)fieldInfo.GetValue(this);
 					string strJudge = div_array[i + 1];
 					int intcheck = int.Parse(div_array[i + 2]);
 					if (strJudge.Equals("="))
@@ -428,23 +424,23 @@ namespace csvutility
 			System.IO.File.Delete(System.IO.Path.Combine(_strPath, _strSource));
 		}
 
-		private bool WritableField(PropertyInfo _info)
+		private bool WritableField(FieldInfo _info)
 		{
 			bool bRet = false;
 
-			if (_info.PropertyType == typeof(int))
+			if (_info.FieldType == typeof(int))
 			{
 				bRet = true;
 			}
-			else if (_info.PropertyType == typeof(float))
+			else if (_info.FieldType == typeof(float))
 			{
 				bRet = true;
 			}
-			else if (_info.PropertyType == typeof(string))
+			else if (_info.FieldType == typeof(string))
 			{
 				bRet = true;
 			}
-			else if (_info.PropertyType == typeof(bool))
+			else if (_info.FieldType == typeof(bool))
 			{
 				bRet = true;
 			}
@@ -472,11 +468,11 @@ namespace csvutility
 				sw = Textreader.Open(Application.persistentDataPath, strTempFilename);
 				//Debug.Log(test++);
 				T dummy = new T();
-				PropertyInfo[] infoArray = dummy.GetType().GetProperties();
+				FieldInfo[] infoArray = dummy.GetType().GetFields();
 				//Debug.Log(test++);
 				bool bIsFirst = true;
 				string strHead = "";
-				foreach (PropertyInfo info in infoArray)
+				foreach (FieldInfo info in infoArray)
 				{
 					if (!WritableField(info))
 					{
@@ -500,7 +496,7 @@ namespace csvutility
 				{
 					bIsFirst = true;
 					string strData = "";
-					foreach (PropertyInfo info in infoArray)
+					foreach (FieldInfo info in infoArray)
 					{
 						//Debug.Log(test++);
 						if (!WritableField(info))
@@ -555,11 +551,11 @@ namespace csvutility
 				sw = Textreader.Open(Application.dataPath, strTempFileName);
 				//Debug.Log(test++);
 				T dummy = new T();
-				PropertyInfo[] infoArray = dummy.GetType().GetProperties();
+				FieldInfo[] infoArray = dummy.GetType().GetFields();
 				//Debug.Log(test++);
 				bool bIsFirst = true;
 				string strHead = "";
-				foreach (PropertyInfo info in infoArray)
+				foreach (FieldInfo info in infoArray)
 				{
 					if (!WritableField(info))
 					{
@@ -581,7 +577,7 @@ namespace csvutility
 				{
 					bIsFirst = true;
 					string strData = "";
-					foreach (PropertyInfo info in infoArray)
+					foreach (FieldInfo info in infoArray)
 					{
 						if (!WritableField(info))
 						{
